@@ -27,19 +27,19 @@ class EagerInitializedSingletonTest {
 
     @Test
     void whenCalledGetInstanceTwoTimesShouldReturnSameObject() {
-        assertEquals(EagerInitializedSingleton.getInstance(), EagerInitializedSingleton.getInstance());
+        assertEquals(EagerInitializedSingleton.INSTANCE, EagerInitializedSingleton.INSTANCE);
     }
 
     @Test
     void whenCalledGetInstanceMultipleTimesShouldReturnSameObject() {
         List<EagerInitializedSingleton> instanceList = new ArrayList<>();
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        instanceList.add(EagerInitializedSingleton.INSTANCE);
 
         Set<Integer> objectCount = new HashSet<>();
 
@@ -69,7 +69,7 @@ class EagerInitializedSingletonTest {
         ExecutorService executor = Executors.newFixedThreadPool(2000);
         List<Callable<Integer>> callables = new ArrayList<>(2000);
         IntStream.range(1, 2000).forEach(i -> {
-            callables.add(() -> EagerInitializedSingleton.getInstance().hashCode());
+            callables.add(() -> EagerInitializedSingleton.INSTANCE.hashCode());
         });
 
         List<Future<Integer>> hashValues = executor.invokeAll(callables);
@@ -108,7 +108,7 @@ class EagerInitializedSingletonTest {
     }
 
     private EagerInitializedSingleton fileSerialize() throws IOException {
-        EagerInitializedSingleton expectedInstance = EagerInitializedSingleton.getInstance();
+        EagerInitializedSingleton expectedInstance = EagerInitializedSingleton.INSTANCE;
         ObjectOutput output = new ObjectOutputStream(new FileOutputStream(fileName));
         output.writeObject(expectedInstance);
         output.close();
