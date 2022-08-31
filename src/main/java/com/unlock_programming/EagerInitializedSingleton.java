@@ -24,5 +24,5 @@ public class EagerInitializedSingleton implements Serializable {
         return INSTANCE;
     }
 
-//    other methods implementations
+//    other methods implementation
 }

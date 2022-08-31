@@ -16,25 +16,23 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EagerInitializedSingletonTest {
+class LazyInitializedSingletonTest {
 
     String fileName;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         fileName = "src/test/resources/lazy-singleton-serialize.ser";
     }
 
     @Test
     void whenCalledGetInstanceTwoTimesShouldReturnSameObject() {
-        assertEquals(EagerInitializedSingleton.getInstance(), EagerInitializedSingleton.getInstance());
+        assertEquals(LazyInitializedSingleton.getInstance(), LazyInitializedSingleton.getInstance());
     }
 
     @Test
     void whenCalledGetInstanceMultipleTimesShouldReturnSameObject() {
         List<EagerInitializedSingleton> instanceList = new ArrayList<>();
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
         instanceList.add(EagerInitializedSingleton.getInstance());
         instanceList.add(EagerInitializedSingleton.getInstance());
         instanceList.add(EagerInitializedSingleton.getInstance());
@@ -50,8 +48,9 @@ class EagerInitializedSingletonTest {
 
     @Test
     void whenCalledPrivateConstructorShouldSingletonRuleViolationException() {
+        LazyInitializedSingleton instance = LazyInitializedSingleton.getInstance();
         Throwable exception = assertThrows(SingletonViolationException.class, () -> {
-            Constructor<EagerInitializedSingleton> constructor = EagerInitializedSingleton.class.getDeclaredConstructor();
+            Constructor<LazyInitializedSingleton> constructor = LazyInitializedSingleton.class.getDeclaredConstructor();
             constructor.setAccessible(true);
             try {
                 constructor.newInstance();
@@ -69,7 +68,7 @@ class EagerInitializedSingletonTest {
         ExecutorService executor = Executors.newFixedThreadPool(2000);
         List<Callable<Integer>> callables = new ArrayList<>(2000);
         IntStream.range(1, 2000).forEach(i -> {
-            callables.add(() -> EagerInitializedSingleton.getInstance().hashCode());
+            callables.add(() -> LazyInitializedSingleton.getInstance().hashCode());
         });
 
         List<Future<Integer>> hashValues = executor.invokeAll(callables);
@@ -80,7 +79,7 @@ class EagerInitializedSingletonTest {
 
         hashValues.stream().forEach(integerFuture -> {
             try {
-                 objectCount.add(integerFuture.get());
+                objectCount.add(integerFuture.get());
             }catch (InterruptedException ie) {
                 ie.printStackTrace();
             }catch (ExecutionException ee) {
@@ -94,26 +93,27 @@ class EagerInitializedSingletonTest {
 
     @Test
     void whenTryingToDeserializeThenShouldReturnSameObject() throws IOException, ClassNotFoundException {
-        EagerInitializedSingleton expectedInstance = fileSerialize();
+        LazyInitializedSingleton expectedInstance = fileSerialize();
 
         File file = new File(fileName);
 
         ObjectInput input = new ObjectInputStream(new FileInputStream(file));
 
-        EagerInitializedSingleton actualInstance = (EagerInitializedSingleton) input.readObject();
+        LazyInitializedSingleton actualInstance = (LazyInitializedSingleton) input.readObject();
         input.close();
         file.delete();
 
         assertEquals(expectedInstance, actualInstance);
     }
 
-    private EagerInitializedSingleton fileSerialize() throws IOException {
-        EagerInitializedSingleton expectedInstance = EagerInitializedSingleton.getInstance();
-        ObjectOutput output = new ObjectOutputStream(new FileOutputStream(fileName));
+    private LazyInitializedSingleton fileSerialize() throws IOException {
+        LazyInitializedSingleton expectedInstance = LazyInitializedSingleton.getInstance();
+        ObjectOutput output = new ObjectOutputStream(new FileOutputStream( fileName));
         output.writeObject(expectedInstance);
         output.close();
 
         return expectedInstance;
     }
+
 
 }
