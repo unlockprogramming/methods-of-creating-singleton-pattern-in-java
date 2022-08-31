@@ -1,10 +1,7 @@
 package com.unlock_programming;
 
-import com.unlock_programming.exception.SingletonViolationException;
 import org.junit.jupiter.api.Test;
 
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -12,7 +9,7 @@ import java.util.Set;
 import java.util.concurrent.*;
 import java.util.stream.IntStream;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class EnumSingletonRectangleTest {
 

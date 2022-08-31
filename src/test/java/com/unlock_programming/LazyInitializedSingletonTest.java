@@ -32,12 +32,12 @@ class LazyInitializedSingletonTest {
 
     @Test
     void whenCalledGetInstanceMultipleTimesShouldReturnSameObject() {
-        List<EagerInitializedSingleton> instanceList = new ArrayList<>();
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
-        instanceList.add(EagerInitializedSingleton.getInstance());
+        List<LazyInitializedSingleton> instanceList = new ArrayList<>();
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
 
         Set<Integer> objectCount = new HashSet<>();
 
