@@ -1,4 +1,4 @@
-package com.unlock_programming;
+package com.unlockprogramming;
 
 import org.junit.jupiter.api.Test;
 

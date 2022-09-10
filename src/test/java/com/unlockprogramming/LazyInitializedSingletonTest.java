@@ -1,6 +1,5 @@
-package com.unlock_programming;
+package com.unlockprogramming;
 
-import com.unlock_programming.exception.SingletonViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,30 +15,28 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class EagerInitializedSingletonTest {
+class LazyInitializedSingletonTest {
 
     String fileName;
 
     @BeforeEach
-    void setUp() {
+    public void setUp() {
         fileName = "src/test/resources/lazy-singleton-serialize.ser";
     }
 
     @Test
     void whenCalledGetInstanceTwoTimesShouldReturnSameObject() {
-        assertEquals(EagerInitializedSingleton.INSTANCE, EagerInitializedSingleton.INSTANCE);
+        assertEquals(LazyInitializedSingleton.getInstance(), LazyInitializedSingleton.getInstance());
     }
 
     @Test
     void whenCalledGetInstanceMultipleTimesShouldReturnSameObject() {
-        List<EagerInitializedSingleton> instanceList = new ArrayList<>();
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
-        instanceList.add(EagerInitializedSingleton.INSTANCE);
+        List<LazyInitializedSingleton> instanceList = new ArrayList<>();
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
+        instanceList.add(LazyInitializedSingleton.getInstance());
 
         Set<Integer> objectCount = new HashSet<>();
 
@@ -50,8 +47,9 @@ class EagerInitializedSingletonTest {
 
     @Test
     void whenCalledPrivateConstructorShouldSingletonRuleViolationException() {
-        Throwable exception = assertThrows(SingletonViolationException.class, () -> {
-            Constructor<EagerInitializedSingleton> constructor = EagerInitializedSingleton.class.getDeclaredConstructor();
+        LazyInitializedSingleton instance = LazyInitializedSingleton.getInstance();
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
+            Constructor<LazyInitializedSingleton> constructor = LazyInitializedSingleton.class.getDeclaredConstructor();
             constructor.setAccessible(true);
             try {
                 constructor.newInstance();
@@ -69,7 +67,7 @@ class EagerInitializedSingletonTest {
         ExecutorService executor = Executors.newFixedThreadPool(2000);
         List<Callable<Integer>> callables = new ArrayList<>(2000);
         IntStream.range(1, 2000).forEach(i -> {
-            callables.add(() -> EagerInitializedSingleton.INSTANCE.hashCode());
+            callables.add(() -> LazyInitializedSingleton.getInstance().hashCode());
         });
 
         List<Future<Integer>> hashValues = executor.invokeAll(callables);
@@ -80,7 +78,7 @@ class EagerInitializedSingletonTest {
 
         hashValues.stream().forEach(integerFuture -> {
             try {
-                 objectCount.add(integerFuture.get());
+                objectCount.add(integerFuture.get());
             }catch (InterruptedException ie) {
                 ie.printStackTrace();
             }catch (ExecutionException ee) {
@@ -94,26 +92,27 @@ class EagerInitializedSingletonTest {
 
     @Test
     void whenTryingToDeserializeThenShouldReturnSameObject() throws IOException, ClassNotFoundException {
-        EagerInitializedSingleton expectedInstance = fileSerialize();
+        LazyInitializedSingleton expectedInstance = fileSerialize();
 
         File file = new File(fileName);
 
         ObjectInput input = new ObjectInputStream(new FileInputStream(file));
 
-        EagerInitializedSingleton actualInstance = (EagerInitializedSingleton) input.readObject();
+        LazyInitializedSingleton actualInstance = (LazyInitializedSingleton) input.readObject();
         input.close();
         file.delete();
 
         assertEquals(expectedInstance, actualInstance);
     }
 
-    private EagerInitializedSingleton fileSerialize() throws IOException {
-        EagerInitializedSingleton expectedInstance = EagerInitializedSingleton.INSTANCE;
-        ObjectOutput output = new ObjectOutputStream(new FileOutputStream(fileName));
+    private LazyInitializedSingleton fileSerialize() throws IOException {
+        LazyInitializedSingleton expectedInstance = LazyInitializedSingleton.getInstance();
+        ObjectOutput output = new ObjectOutputStream(new FileOutputStream( fileName));
         output.writeObject(expectedInstance);
         output.close();
 
         return expectedInstance;
     }
+
 
 }

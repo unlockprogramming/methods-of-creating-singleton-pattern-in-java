@@ -1,6 +1,5 @@
-package com.unlock_programming;
+package com.unlockprogramming;
 
-import com.unlock_programming.exception.SingletonViolationException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -16,28 +15,28 @@ import java.util.stream.IntStream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class LazyInitializedSingletonTest {
+class InnerStaticClassSingletonTest {
 
     String fileName;
 
     @BeforeEach
     public void setUp() {
-        fileName = "src/test/resources/lazy-singleton-serialize.ser";
+        fileName = "src/test/resources/inner-class-singleton-serialize.ser";
     }
 
     @Test
     void whenCalledGetInstanceTwoTimesShouldReturnSameObject() {
-        assertEquals(LazyInitializedSingleton.getInstance(), LazyInitializedSingleton.getInstance());
+        assertEquals(InnerClassSingleton.getInstance(), InnerClassSingleton.getInstance());
     }
 
     @Test
     void whenCalledGetInstanceMultipleTimesShouldReturnSameObject() {
-        List<LazyInitializedSingleton> instanceList = new ArrayList<>();
-        instanceList.add(LazyInitializedSingleton.getInstance());
-        instanceList.add(LazyInitializedSingleton.getInstance());
-        instanceList.add(LazyInitializedSingleton.getInstance());
-        instanceList.add(LazyInitializedSingleton.getInstance());
-        instanceList.add(LazyInitializedSingleton.getInstance());
+        List<InnerClassSingleton> instanceList = new ArrayList<>();
+        instanceList.add(InnerClassSingleton.getInstance());
+        instanceList.add(InnerClassSingleton.getInstance());
+        instanceList.add(InnerClassSingleton.getInstance());
+        instanceList.add(InnerClassSingleton.getInstance());
+        instanceList.add(InnerClassSingleton.getInstance());
 
         Set<Integer> objectCount = new HashSet<>();
 
@@ -46,11 +45,13 @@ class LazyInitializedSingletonTest {
         assertEquals(1, objectCount.size());
     }
 
+
     @Test
-    void whenCalledPrivateConstructorShouldSingletonRuleViolationException() {
-        LazyInitializedSingleton instance = LazyInitializedSingleton.getInstance();
-        Throwable exception = assertThrows(SingletonViolationException.class, () -> {
-            Constructor<LazyInitializedSingleton> constructor = LazyInitializedSingleton.class.getDeclaredConstructor();
+    void whenCalledPrivateConstructorShouldSingletonRuleViolationException() throws NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+        InnerClassSingleton instance = InnerClassSingleton.getInstance();
+
+        Throwable exception = assertThrows(RuntimeException.class, () -> {
+            Constructor<InnerClassSingleton> constructor = InnerClassSingleton.class.getDeclaredConstructor();
             constructor.setAccessible(true);
             try {
                 constructor.newInstance();
@@ -68,7 +69,7 @@ class LazyInitializedSingletonTest {
         ExecutorService executor = Executors.newFixedThreadPool(2000);
         List<Callable<Integer>> callables = new ArrayList<>(2000);
         IntStream.range(1, 2000).forEach(i -> {
-            callables.add(() -> LazyInitializedSingleton.getInstance().hashCode());
+            callables.add(() -> InnerClassSingleton.getInstance().hashCode());
         });
 
         List<Future<Integer>> hashValues = executor.invokeAll(callables);
@@ -93,27 +94,26 @@ class LazyInitializedSingletonTest {
 
     @Test
     void whenTryingToDeserializeThenShouldReturnSameObject() throws IOException, ClassNotFoundException {
-        LazyInitializedSingleton expectedInstance = fileSerialize();
+        InnerClassSingleton expectedInstance = fileSerialize();
 
         File file = new File(fileName);
 
         ObjectInput input = new ObjectInputStream(new FileInputStream(file));
 
-        LazyInitializedSingleton actualInstance = (LazyInitializedSingleton) input.readObject();
+        InnerClassSingleton actualInstance = (InnerClassSingleton) input.readObject();
         input.close();
         file.delete();
 
         assertEquals(expectedInstance, actualInstance);
     }
 
-    private LazyInitializedSingleton fileSerialize() throws IOException {
-        LazyInitializedSingleton expectedInstance = LazyInitializedSingleton.getInstance();
+    private InnerClassSingleton fileSerialize() throws IOException {
+        InnerClassSingleton expectedInstance = InnerClassSingleton.getInstance();
         ObjectOutput output = new ObjectOutputStream(new FileOutputStream( fileName));
         output.writeObject(expectedInstance);
         output.close();
 
         return expectedInstance;
     }
-
 
 }

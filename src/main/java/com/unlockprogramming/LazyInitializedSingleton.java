@@ -1,6 +1,4 @@
-package com.unlock_programming;
-
-import com.unlock_programming.exception.SingletonViolationException;
+package com.unlockprogramming;
 
 import java.io.Serializable;
 
@@ -12,7 +10,7 @@ public class LazyInitializedSingleton implements Serializable {
 
     private LazyInitializedSingleton() {
         if (instance != null) {
-            throw new SingletonViolationException("This Singleton Class is already initialized. Use getInstance Method instead");
+            throw new RuntimeException("This Singleton Class is already initialized. Use getInstance Method instead");
         }
     }
 
